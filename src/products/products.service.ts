@@ -11,36 +11,31 @@ export class ProductsService {
     constructor(@InjectModel(Product.name) private productModel: Model<Product>) {}
 
     async create(createProductDto: CreateProductDto) {
-        console.log(createProductDto)
         const alreadyExists = await this.productModel.find({name:createProductDto.name}).exec()
-        console.log("teste",alreadyExists)
-        if(alreadyExists.length) {
-            throw new HttpException('Product already exists', HttpStatus.CONFLICT)
-        }
-        const newProduct = new this.productModel(createProductDto);
-        const savedProduct = await newProduct.save();
+        if(alreadyExists.length) throw new HttpException('Product already exists', HttpStatus.CONFLICT)
 
-        console.log(savedProduct)
-        return "New product added";
+        const newProduct = new this.productModel(createProductDto);
+        const product = await newProduct.save();
+        const productObject = product.toObject({versionKey: false})
+
+        console.log(productObject)
+        return productObject;
     }
 
-    async findAll(page: number,name: string) {
+    async findAll(page: number,filter: string) {
         let query: any = {}
-        if(name) {
-            query.name = {$regex: new RegExp(name)}
+        if(filter) {
+            query.name = {$regex: new RegExp(filter)}
         }
 
         const perPage = 10;
         const skip = (page - 1) * perPage;
 
-        const testt = await this.productModel
+        return this.productModel
         .find(query)
         .select('-__v')
         .skip(skip)
         .limit(perPage)
         .exec();
-
-        console.log(testt)
-        return testt
     }
 }

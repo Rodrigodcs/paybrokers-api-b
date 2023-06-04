@@ -24,10 +24,8 @@ export class ProductsController {
     @Get(':page')
     async findAll(
         @Param('page') page:number,
-        @Query('name') name: string,
+        @Query('filter') filter: string,
     ): Promise<Product[]> {
-        console.log("page", page)
-        console.log("name", name)
-        return this.productsService.findAll(page,name)
+        return this.productsService.findAll(page,filter)
     } 
 }
