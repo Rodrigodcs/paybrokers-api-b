@@ -14,18 +14,14 @@ export class ProductsController {
         @Payload() createProductDto: CreateProductDto,
         @Ctx() context: RmqContext 
     ) {
-        const channel = context.getChannelRef();
-        const originalMsg = context.getMessage();
-        
-        channel.ack(originalMsg)
-        return this.productsService.create(createProductDto);
+        return this.productsService.create(createProductDto, context)
     }
 
     @Get(':page')
-    async findAll(
+    async findAllByPage(
         @Param('page') page:number,
         @Query('filter') filter: string,
     ): Promise<Product[]> {
-        return this.productsService.findAll(page,filter)
+        return this.productsService.findAllByPage(page,filter)
     } 
 }
